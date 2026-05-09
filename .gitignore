@@ -16,3 +16,27 @@ phpstan.neon
 /.phpcs-cache
 /phpcs.xml
 ###< squizlabs/php_codesniffer ###
+
+vendor/
+bin/
+.phpunit.result.cache
+coverage.xml
+public/
+config/packages/
+config/routes/
+config/preload.php
+config/bundles.php
+config/routes.yaml
+src/Kernel.php
+.env
+.env.dev
+
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
