@@ -47,18 +47,22 @@ return [
 
 ## Configuration
 
-The bundle comes with a sensible default configuration. You can override it by creating a configuration file at `config/packages/antronin_consulting_psw_expiration.yaml`.
+The bundle comes with a sensible default configuration. You can override it by creating a configuration file at `config/packages/psw_expiration.yaml`.
 
 ```yaml
 # config/packages/psw_expiration.yaml
 psw_expiration:
-    # (Optional) Number of days after which a password expires.
-    # Default: 90
-    password_lifetime_days: 90
+    # (Optional) The units for the below settings. Can be 'days', 'hours', 'weeks', 'months'
+    # Default: days
+    unit: 'days'
 
-    # (Optional) Number of days before expiration to start showing warnings.
+    # (Optional) Number of units after which a password expires.
+    # Default: 90
+    lifetime: 90
+
+    # (Optional) Number of units before expiration to start showing warnings.
     # Default: 14
-    warning_threshold_days: 14
+    warning_threshold: 14
 ```
 
 ## Usage
@@ -118,4 +122,25 @@ You can use the provided Twig functions to check the user's password status and 
         <div class="alert alert-warning">Your password will expire soon. Please consider changing it.</div>
     {% endif %}
 {% endif %}
+```
+
+## Translations
+
+The bundle uses translatable enum cases for time units. If you want to display these units in your templates, you can provide translations for them. The translation domain is `PswExpirationBundle`.
+
+Here are the keys you can translate:
+
+- `unit.hours`
+- `unit.days`
+- `unit.weeks`
+- `unit.months`
+
+For example, to provide French translations, create a file like `translations/PswExpirationBundle.fr.yaml`:
+
+```yaml
+# translations/PswExpirationBundle.fr.yaml
+unit.hours: heure(s)
+unit.days: jour(s)
+unit.weeks: semaine(s)
+unit.months: mois
 ```
