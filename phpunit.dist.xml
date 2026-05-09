@@ -10,6 +10,12 @@
          bootstrap="tests/bootstrap.php"
          cacheDirectory=".phpunit.cache"
 >
+  <coverage>
+    <report>
+      <clover outputFile="coverage.xml"/>
+      <text outputFile="php://stdout"/>
+    </report>
+  </coverage>
     <php>
         <ini name="display_errors" value="1" />
         <ini name="error_reporting" value="-1" />
@@ -29,8 +35,12 @@
             restrictWarnings="true"
     >
         <include>
-            <directory>src</directory>
+            <directory suffix=".php">src</directory>
         </include>
+
+        <exclude>
+            <directory>vendor</directory>
+        </exclude>
 
         <deprecationTrigger>
             <function>trigger_deprecation</function>
