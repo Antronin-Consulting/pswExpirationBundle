@@ -1,13 +1,12 @@
 <?php
 
-
-use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use AntroninConsulting\PswExpirationBundle\Config\Unit;
+use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 
 return static function (DefinitionConfigurator $definition): void {
     $definition->rootNode()->children()
         ->enumNode(name: 'unit')
-        ->values(values: array_map(fn(Unit $unit) => $unit->value, Unit::cases()))
+        ->values(values: array_map(fn (Unit $unit) => $unit->value, Unit::cases()))
         ->defaultValue(value: Unit::DAYS->value)
         ->info(info: 'The unit of time for password expiration.')->end()
         ->integerNode(name: 'password_lifetime')
