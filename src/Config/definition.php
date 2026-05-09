@@ -9,7 +9,7 @@ return static function (DefinitionConfigurator $definition): void {
         ->values(values: array_map(fn (Unit $unit) => $unit->value, Unit::cases()))
         ->defaultValue(value: Unit::DAYS->value)
         ->info(info: 'The unit of time for password expiration.')->end()
-        ->integerNode(name: 'password_lifetime')
+        ->integerNode(name: 'lifetime')
         ->defaultValue(value: 90)
         ->info(info: 'Number of units after which a password expires.')
         ->end()
