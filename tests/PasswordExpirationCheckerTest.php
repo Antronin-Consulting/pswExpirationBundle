@@ -4,7 +4,6 @@ namespace AntroninConsulting\PswExpirationBundle\Tests\Security;
 
 use AntroninConsulting\PswExpirationBundle\Security\PasswordExpirationChecker;
 use AntroninConsulting\PswExpirationBundle\Security\PasswordExpirationUserInterface;
-use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class PasswordExpirationCheckerTest extends TestCase
@@ -13,7 +12,7 @@ class PasswordExpirationCheckerTest extends TestCase
     private const WARNING = 14;
 
     private PasswordExpirationChecker $checker;
-    private $user;
+    private PasswordExpirationUserInterface $user;
 
     protected function setUp(): void
     {
@@ -33,7 +32,7 @@ class PasswordExpirationCheckerTest extends TestCase
 
     public function testIsPasswordExpiredReturnsTrueForExpiredPassword(): void
     {
-        $lastChange = new DateTimeImmutable(datetime: sprintf('-%d days', self::LIFETIME + 1));
+        $lastChange = new \DateTimeImmutable(datetime: sprintf('-%d days', self::LIFETIME + 1));
         $this->user->method(constraint: 'getLastPasswordChange')->willReturn(value: $lastChange);
 
         self::assertTrue(condition: $this->checker->isPasswordExpired(user: $this->user));
@@ -41,7 +40,7 @@ class PasswordExpirationCheckerTest extends TestCase
 
     public function testIsPasswordExpiredReturnsFalseForActivePassword(): void
     {
-        $lastChange = new DateTimeImmutable(datetime: '-10 days');
+        $lastChange = new \DateTimeImmutable(datetime: '-10 days');
         $this->user->method(constraint: 'getLastPasswordChange')->willReturn(value: $lastChange);
 
         self::assertFalse(condition: $this->checker->isPasswordExpired(user: $this->user));
@@ -58,7 +57,7 @@ class PasswordExpirationCheckerTest extends TestCase
     {
         // Password expires in (LIFETIME - (LIFETIME - WARNING + 1)) = WARNING - 1 days
         $daysAgo = self::LIFETIME - self::WARNING + 1;
-        $lastChange = new DateTimeImmutable(datetime: sprintf('-%d days', $daysAgo));
+        $lastChange = new \DateTimeImmutable(datetime: sprintf('-%d days', $daysAgo));
         $this->user->method(constraint: 'getLastPasswordChange')->willReturn(value: $lastChange);
 
         self::assertTrue(condition: $this->checker->isPasswordNearingExpiration(user: $this->user));
@@ -66,7 +65,7 @@ class PasswordExpirationCheckerTest extends TestCase
 
     public function testIsPasswordNearingExpirationReturnsFalseWhenBeforeWarningPeriod(): void
     {
-        $lastChange = new DateTimeImmutable(datetime: '-1 day');
+        $lastChange = new \DateTimeImmutable(datetime: '-1 day');
         $this->user->method(constraint: 'getLastPasswordChange')->willReturn(value: $lastChange);
 
         self::assertFalse(condition: $this->checker->isPasswordNearingExpiration(user: $this->user));
@@ -74,7 +73,7 @@ class PasswordExpirationCheckerTest extends TestCase
 
     public function testIsPasswordNearingExpirationReturnsFalseWhenPasswordIsExpired(): void
     {
-        $lastChange = new DateTimeImmutable(datetime: sprintf('-%d days', self::LIFETIME + 1));
+        $lastChange = new \DateTimeImmutable(datetime: sprintf('-%d days', self::LIFETIME + 1));
         $this->user->method(constraint: 'getLastPasswordChange')->willReturn(value: $lastChange);
 
         self::assertFalse(condition: $this->checker->isPasswordNearingExpiration(user: $this->user));
@@ -83,7 +82,7 @@ class PasswordExpirationCheckerTest extends TestCase
     public function testIsPasswordNearingExpirationOnWarningBoundary(): void
     {
         $daysAgo = self::LIFETIME - self::WARNING;
-        $lastChange = new DateTimeImmutable(datetime: sprintf('-%d days', $daysAgo));
+        $lastChange = new \DateTimeImmutable(datetime: sprintf('-%d days', $daysAgo));
         $this->user->method(constraint: 'getLastPasswordChange')->willReturn(value: $lastChange);
 
         self::assertTrue(condition: $this->checker->isPasswordNearingExpiration(user: $this->user));

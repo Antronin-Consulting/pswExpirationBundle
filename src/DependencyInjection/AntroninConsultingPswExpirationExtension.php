@@ -12,15 +12,15 @@ class AntroninConsultingPswExpirationExtension extends Extension
     public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration(configuration: $configuration, configs: $configs);
 
         $loader = new YamlFileLoader(
-            $container,
-            new FileLocator(__DIR__ . '/../Resources/config')
+            container: $container,
+            locator: new FileLocator(paths: __DIR__ . '/../Resources/config')
         );
-        $loader->load('services.yaml');
+        $loader->load(resource: 'services.yaml');
 
-        $container->setParameter('antronin_consulting_psw_expiration.password_lifetime_days', $config['password_lifetime_days']);
-        $container->setParameter('antronin_consulting_psw_expiration.warning_threshold_days', $config['warning_threshold_days']);
+        $container->setParameter(name: 'antronin_consulting_psw_expiration.password_lifetime_days', value: $config['password_lifetime_days']);
+        $container->setParameter(name: 'antronin_consulting_psw_expiration.warning_threshold_days', value: $config['warning_threshold_days']);
     }
 }

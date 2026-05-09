@@ -19,8 +19,8 @@ class PasswordExpirationExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('is_password_expired', [$this, 'isPasswordExpired']),
-            new TwigFunction('is_password_nearing_expiration', [$this, 'isPasswordNearingExpiration']),
+            new TwigFunction(name: 'is_password_expired', callable: [$this, 'isPasswordExpired']),
+            new TwigFunction(name: 'is_password_nearing_expiration', callable: [$this, 'isPasswordNearingExpiration']),
         ];
     }
 
@@ -30,7 +30,7 @@ class PasswordExpirationExtension extends AbstractExtension
             return false;
         }
 
-        return $this->passwordExpirationChecker->isPasswordExpired($user);
+        return $this->passwordExpirationChecker->isPasswordExpired(user: $user);
     }
 
     public function isPasswordNearingExpiration(?PasswordExpirationUserInterface $user): bool
@@ -39,6 +39,6 @@ class PasswordExpirationExtension extends AbstractExtension
             return false;
         }
 
-        return $this->passwordExpirationChecker->isPasswordNearingExpiration($user);
+        return $this->passwordExpirationChecker->isPasswordNearingExpiration(user: $user);
     }
 }

@@ -12,12 +12,13 @@ class PasswordExpirationExtensionTest extends TestCase
 {
     private PasswordExpirationChecker $checker;
     private PasswordExpirationExtension $extension;
-    private $user;
+    private PasswordExpirationUserInterface $user;
 
     protected function setUp(): void
     {
         $this->user = $this->createStub(type: PasswordExpirationUserInterface::class);
     }
+
     public function testGetFunctions(): void
     {
         $this->checker = $this->createStub(type: PasswordExpirationChecker::class);

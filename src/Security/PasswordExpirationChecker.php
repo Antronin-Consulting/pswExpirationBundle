@@ -2,8 +2,6 @@
 
 namespace AntroninConsulting\PswExpirationBundle\Security;
 
-use DateTimeImmutable;
-
 class PasswordExpirationChecker
 {
     private int $passwordLifetimeDays;
@@ -26,7 +24,7 @@ class PasswordExpirationChecker
         }
 
         $expirationDate = $lastChange->modify(sprintf('+%d days', $this->passwordLifetimeDays));
-        $now = new DateTimeImmutable();
+        $now = new \DateTimeImmutable();
 
         return $now > $expirationDate;
     }
@@ -40,7 +38,7 @@ class PasswordExpirationChecker
 
         $expirationDate = $lastChange->modify(sprintf('+%d days', $this->passwordLifetimeDays));
         $warningDate = $expirationDate->modify(sprintf('-%d days', $this->warningThresholdDays));
-        $now = new DateTimeImmutable();
+        $now = new \DateTimeImmutable();
 
         return $now >= $warningDate && $now < $expirationDate;
     }
