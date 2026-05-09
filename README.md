@@ -12,7 +12,7 @@ This Symfony bundle provides a solution to enforce a password expiration policy 
 
 ## Installation
 
-Make sure Composer is installed globally, as explained in the installation chapter of the Composer documentation.
+Make sure Composer is installed globally, as explained in the [installation chapter](https://getcomposer.org/doc/00-intro.md) of the Composer documentation.
 
 ### Applications that use Symfony Flex
 
@@ -50,8 +50,8 @@ return [
 The bundle comes with a sensible default configuration. You can override it by creating a configuration file at `config/packages/antronin_consulting_psw_expiration.yaml`.
 
 ```yaml
-# config/packages/antronin_consulting_psw_expiration.yaml
-antronin_consulting_psw_expiration:
+# config/packages/psw_expiration.yaml
+psw_expiration:
     # (Optional) Number of days after which a password expires.
     # Default: 90
     password_lifetime_days: 90
