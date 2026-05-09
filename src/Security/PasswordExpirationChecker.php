@@ -2,15 +2,19 @@
 
 namespace AntroninConsulting\PswExpirationBundle\Security;
 
+use AntroninConsulting\PswExpirationBundle\Config\Unit;
+
 class PasswordExpirationChecker
 {
-    private int $passwordLifetimeDays;
-    private int $warningThresholdDays;
+    private int $passwordLifetime;
+    private int $warningThreshold;
+    private Unit $unit;
 
-    public function __construct(int $passwordLifetimeDays, int $warningThresholdDays)
+    public function __construct(int $passwordLifetime, int $warningThreshold, Unit $unit)
     {
-        $this->passwordLifetimeDays = $passwordLifetimeDays;
-        $this->warningThresholdDays = $warningThresholdDays;
+        $this->passwordLifetime = $passwordLifetime;
+        $this->warningThreshold = $warningThreshold;
+        $this->unit = $unit;
     }
 
     public function isPasswordExpired(PasswordExpirationUserInterface $user): bool
@@ -23,7 +27,7 @@ class PasswordExpirationChecker
             return false;
         }
 
-        $expirationDate = $lastChange->modify(sprintf('+%d days', $this->passwordLifetimeDays));
+        $expirationDate = $lastChange->modify(sprintf('+%d %s', $this->passwordLifetime, $this->unit->value));
         $now = new \DateTimeImmutable();
 
         return $now > $expirationDate;
@@ -36,8 +40,8 @@ class PasswordExpirationChecker
             return false;
         }
 
-        $expirationDate = $lastChange->modify(sprintf('+%d days', $this->passwordLifetimeDays));
-        $warningDate = $expirationDate->modify(sprintf('-%d days', $this->warningThresholdDays));
+        $expirationDate = $lastChange->modify(sprintf('+%d %s', $this->passwordLifetime, $this->unit->value));
+        $warningDate = $expirationDate->modify(sprintf('-%d %s', $this->warningThreshold, $this->unit->value));
         $now = new \DateTimeImmutable();
 
         return $now >= $warningDate && $now < $expirationDate;

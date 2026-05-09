@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    AntroninConsulting\PswExpirationBundle\:
+        resource: '../src/'
+        exclude: '../src/Config/definition.php'
