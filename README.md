@@ -1,4 +1,6 @@
-# Antronin Consulting Password Expiration Bundle
+# Password Expiration Bundle
+
+[![codecov](https://codecov.io/gh/Antronin-Consulting/pswExpirationBundle/graph/badge.svg?token=iLzCzpu1uw)](https://codecov.io/gh/Antronin-Consulting/pswExpirationBundle)
 
 This Symfony bundle provides a solution to enforce a password expiration policy for your users. It allows you to configure a password lifetime, warn users before their password expires, and check if a password has already expired.
 
