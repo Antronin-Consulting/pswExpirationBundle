@@ -10,9 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class PasswordExpirationCheckerTest extends TestCase
 {
-    private const LIFETIME = 90;
-    private const WARNING = 14;
-
     private PasswordExpirationUserInterface $user;
 
     protected function setUp(): void
@@ -20,91 +17,58 @@ class PasswordExpirationCheckerTest extends TestCase
         $this->user = $this->createStub(type: PasswordExpirationUserInterface::class);
     }
 
-    public static function unitProvider(): array
+    #[DataProvider(methodName: 'expiredProvider')]
+    public function testIsPasswordExpired(int $lifetime, string $lastChange, Unit $unit, bool $expected): void
+    {
+        $this->user->method('getLastPasswordChange')->willReturn(new \DateTimeImmutable(datetime: $lastChange));
+        $checker = new PasswordExpirationChecker(passwordLifetime: $lifetime, warningThreshold: 14, unit: $unit);
+        self::assertSame(expected: $expected, actual: $checker->isPasswordExpired(user: $this->user));
+    }
+
+    public static function expiredProvider(): array
     {
         return [
-            [Unit::HOURS],
-            [Unit::DAYS],
-            [Unit::WEEKS],
-            [Unit::MONTHS],
+            'expired days' => [90, '-91 days', Unit::DAYS, true],
+            'not expired days' => [90, '-89 days', Unit::DAYS, false],
+            'expired edge days' => [90, '-90 days -1 second', Unit::DAYS, true],
+            'not expired edge days' => [90, '-90 days', Unit::DAYS, false],
+            'expired months' => [3, '-4 months', Unit::MONTHS, true],
+            'not expired months' => [3, '-2 months', Unit::MONTHS, false],
         ];
     }
 
-    public function testIsPasswordExpiredReturnsFalseWhenNoLastChangeDate(): void
+    public function testIsPasswordExpiredWithNullLastChange(): void
     {
-        $checker = new PasswordExpirationChecker(passwordLifetime: self::LIFETIME, warningThreshold: self::WARNING, unit: Unit::DAYS);
-        $this->user->method(constraint: 'getLastPasswordChange')->willReturn(value: null);
-
-        self::assertFalse(condition: $checker->isPasswordExpired(user: $this->user));
-    }
-
-    #[DataProvider(methodName: 'unitProvider')]
-    public function testIsPasswordExpiredReturnsTrueForExpiredPassword(Unit $unit): void
-    {
-        $checker = new PasswordExpirationChecker(self::LIFETIME, self::WARNING, $unit);
-        $lastChange = new \DateTimeImmutable(datetime: sprintf('-%d %s', self::LIFETIME + 1, $unit->value));
-        $this->user->method(constraint: 'getLastPasswordChange')->willReturn(value: $lastChange);
-
-        self::assertTrue(condition: $checker->isPasswordExpired(user: $this->user));
-    }
-
-    #[DataProvider(methodName: 'unitProvider')]
-    public function testIsPasswordExpiredReturnsFalseForActivePassword(Unit $unit): void
-    {
-        $checker = new PasswordExpirationChecker(self::LIFETIME, self::WARNING, $unit);
-        $lastChange = new \DateTimeImmutable(datetime: sprintf('-10 %s', $unit->value));
-        $this->user->method(constraint: 'getLastPasswordChange')->willReturn(value: $lastChange);
-
-        self::assertFalse(condition: $checker->isPasswordExpired(user: $this->user));
-    }
-
-    public function testIsPasswordNearingExpirationReturnsFalseWhenNoLastChangeDate(): void
-    {
-        $checker = new PasswordExpirationChecker(self::LIFETIME, self::WARNING, Unit::DAYS);
         $this->user->method('getLastPasswordChange')->willReturn(null);
-
-        self::assertFalse($checker->isPasswordNearingExpiration($this->user));
+        $checker = new PasswordExpirationChecker(passwordLifetime: 90, warningThreshold: 14, unit: Unit::DAYS);
+        self::assertFalse($checker->isPasswordExpired(user: $this->user));
     }
 
-    #[DataProvider(methodName: 'unitProvider')]
-    public function testIsPasswordNearingExpirationReturnsTrueWhenInWarningPeriod(Unit $unit): void
+    #[DataProvider(methodName: 'nearingExpirationProvider')]
+    public function testIsPasswordNearingExpiration(int $lifetime, int $warning, string $lastChange, Unit $unit, bool $expected): void
     {
-        $checker = new PasswordExpirationChecker(self::LIFETIME, self::WARNING, $unit);
-        $daysAgo = self::LIFETIME - self::WARNING + 1;
-        $lastChange = new \DateTimeImmutable(datetime: sprintf('-%d %s', $daysAgo, $unit->value));
-        $this->user->method(constraint: 'getLastPasswordChange')->willReturn(value: $lastChange);
-
-        self::assertTrue(condition: $checker->isPasswordNearingExpiration(user: $this->user));
+        $this->user->method('getLastPasswordChange')->willReturn(new \DateTimeImmutable($lastChange));
+        $checker = new PasswordExpirationChecker(passwordLifetime: $lifetime, warningThreshold: $warning, unit: $unit);
+        self::assertSame(expected: $expected, actual: $checker->isPasswordNearingExpiration(user: $this->user));
     }
 
-    #[DataProvider(methodName: 'unitProvider')]
-    public function testIsPasswordNearingExpirationReturnsFalseWhenBeforeWarningPeriod(Unit $unit): void
+    public static function nearingExpirationProvider(): array
     {
-        $checker = new PasswordExpirationChecker(self::LIFETIME, self::WARNING, $unit);
-        $lastChange = new \DateTimeImmutable(datetime: sprintf('-1 %s', $unit->value));
-        $this->user->method(constraint: 'getLastPasswordChange')->willReturn(value: $lastChange);
-
-        self::assertFalse(condition: $checker->isPasswordNearingExpiration(user: $this->user));
+        return [
+            'not nearing yet' => [90, 14, '-10 days', Unit::DAYS, false],
+            'nearing' => [90, 14, '-80 days', Unit::DAYS, true],
+            'expired' => [90, 14, '-100 days', Unit::DAYS, false],
+            'nearing on warning threshold edge' => [90, 14, '-76 days', Unit::DAYS, true],
+            'not nearing just before warning threshold' => [90, 14, '-75 days', Unit::DAYS, false],
+            'nearing on expiration edge' => [90, 14, '-89 days', Unit::DAYS, true],
+            'exactly expired' => [90, 14, '-90 days', Unit::DAYS, false],
+        ];
     }
 
-    #[DataProvider(methodName: 'unitProvider')]
-    public function testIsPasswordNearingExpirationReturnsFalseWhenPasswordIsExpired(Unit $unit): void
+    public function testIsPasswordNearingExpirationWithNullLastChange(): void
     {
-        $checker = new PasswordExpirationChecker(self::LIFETIME, self::WARNING, $unit);
-        $lastChange = new \DateTimeImmutable(datetime: sprintf('-%d %s', self::LIFETIME + 1, $unit->value));
-        $this->user->method(constraint: 'getLastPasswordChange')->willReturn(value: $lastChange);
-
-        self::assertFalse(condition: $checker->isPasswordNearingExpiration(user: $this->user));
-    }
-
-    #[DataProvider(methodName: 'unitProvider')]
-    public function testIsPasswordNearingExpirationOnWarningBoundary(Unit $unit): void
-    {
-        $checker = new PasswordExpirationChecker(self::LIFETIME, self::WARNING, $unit);
-        $daysAgo = self::LIFETIME - self::WARNING;
-        $lastChange = new \DateTimeImmutable(datetime: sprintf('-%d %s', $daysAgo, $unit->value));
-        $this->user->method(constraint: 'getLastPasswordChange')->willReturn(value: $lastChange);
-
-        self::assertTrue(condition: $checker->isPasswordNearingExpiration(user: $this->user));
+        $this->user->method('getLastPasswordChange')->willReturn(null);
+        $checker = new PasswordExpirationChecker(passwordLifetime: 90, warningThreshold: 14, unit: Unit::DAYS);
+        self::assertFalse($checker->isPasswordNearingExpiration(user: $this->user));
     }
 }

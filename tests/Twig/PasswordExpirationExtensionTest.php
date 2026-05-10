@@ -63,4 +63,13 @@ class PasswordExpirationExtensionTest extends TestCase
 
         self::assertTrue(condition: $this->extension->isPasswordNearingExpiration(user: $this->user));
     }
+
+    public function testIsPasswordNearingExpirationWithNullUser(): void
+    {
+        $this->checker = $this->createMock(type: PasswordExpirationChecker::class);
+        $this->checker->expects($this->never())->method('isPasswordNearingExpiration');
+        $this->extension = new PasswordExpirationExtension(passwordExpirationChecker: $this->checker);
+
+        self::assertFalse(condition: $this->extension->isPasswordNearingExpiration(user: null));
+    }
 }

@@ -30,7 +30,7 @@ class PasswordExpirationChecker
         $expirationDate = $lastChange->modify(sprintf('+%d %s', $this->passwordLifetime, $this->unit->value));
         $now = new \DateTimeImmutable();
 
-        return $now > $expirationDate;
+        return $now->getTimestamp() > $expirationDate->getTimestamp();
     }
 
     public function isPasswordNearingExpiration(PasswordExpirationUserInterface $user): bool
@@ -44,6 +44,6 @@ class PasswordExpirationChecker
         $warningDate = $expirationDate->modify(sprintf('-%d %s', $this->warningThreshold, $this->unit->value));
         $now = new \DateTimeImmutable();
 
-        return $now >= $warningDate && $now < $expirationDate;
+        return $now->getTimestamp() >= $warningDate->getTimestamp() && $now->getTimestamp() < $expirationDate->getTimestamp();
     }
 }
