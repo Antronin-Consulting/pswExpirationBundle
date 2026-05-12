@@ -7,3 +7,9 @@ services:
     AntroninConsulting\PswExpirationBundle\:
         resource: '../src/'
         exclude: '../src/Config/definition.php'
+
+    AntroninConsulting\PswExpirationBundle\Security\PasswordExpirationChecker:
+        bind:
+            $passwordLifetime: '%psw_expiration.lifetime%'
+            $warningThreshold: '%psw_expiration.warning_threshold%'
+            $unit: '%psw_expiration.unit%'
