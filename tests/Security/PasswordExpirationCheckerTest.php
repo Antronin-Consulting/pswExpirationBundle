@@ -7,6 +7,7 @@ use AntroninConsulting\PswExpirationBundle\Security\PasswordExpirationChecker;
 use AntroninConsulting\PswExpirationBundle\Security\PasswordExpirationUserInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\Stub;
 
 class PasswordExpirationCheckerTest extends TestCase
 {
@@ -14,17 +15,21 @@ class PasswordExpirationCheckerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->user = $this->createStub(type: PasswordExpirationUserInterface::class);
+        $this->user = $this->createStub(PasswordExpirationUserInterface::class);
     }
 
-    #[DataProvider(methodName: 'expiredProvider')]
+    #[DataProvider('expiredProvider')]
     public function testIsPasswordExpired(int $lifetime, string $lastChange, Unit $unit, bool $expected): void
     {
         $this->user->method('getLastPasswordChange')->willReturn(new \DateTimeImmutable(datetime: $lastChange));
         $checker = new PasswordExpirationChecker(passwordLifetime: $lifetime, warningThreshold: 14, unit: $unit);
-        self::assertSame(expected: $expected, actual: $checker->isPasswordExpired(user: $this->user));
+        self::assertSame($expected,  $checker->isPasswordExpired(user: $this->user));
     }
 
+    /**
+     * @return array <string, array{0: int, 1: string, 2: Unit, 3: bool}>
+     *
+     */
     public static function expiredProvider(): array
     {
         return [
@@ -44,14 +49,17 @@ class PasswordExpirationCheckerTest extends TestCase
         self::assertFalse($checker->isPasswordExpired(user: $this->user));
     }
 
-    #[DataProvider(methodName: 'nearingExpirationProvider')]
+    #[DataProvider('nearingExpirationProvider')]
     public function testIsPasswordNearingExpiration(int $lifetime, int $warning, string $lastChange, Unit $unit, bool $expected): void
     {
         $this->user->method('getLastPasswordChange')->willReturn(new \DateTimeImmutable($lastChange));
         $checker = new PasswordExpirationChecker(passwordLifetime: $lifetime, warningThreshold: $warning, unit: $unit);
-        self::assertSame(expected: $expected, actual: $checker->isPasswordNearingExpiration(user: $this->user));
+        self::assertSame($expected,  $checker->isPasswordNearingExpiration(user: $this->user));
     }
 
+    /**
+     * @return array <string, array{0: int, 1: int, 2: string, 3: Unit, 4: bool}>
+     */
     public static function nearingExpirationProvider(): array
     {
         return [

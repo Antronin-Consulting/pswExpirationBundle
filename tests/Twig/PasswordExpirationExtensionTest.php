@@ -16,60 +16,60 @@ class PasswordExpirationExtensionTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->user = $this->createStub(type: PasswordExpirationUserInterface::class);
+        $this->user = $this->createStub(PasswordExpirationUserInterface::class);
     }
 
     public function testGetFunctions(): void
     {
-        $this->checker = $this->createStub(type: PasswordExpirationChecker::class);
+        $this->checker = $this->createStub(PasswordExpirationChecker::class);
         $this->extension = new PasswordExpirationExtension(passwordExpirationChecker: $this->checker);
         $functions = $this->extension->getFunctions();
-        self::assertCount(expectedCount: 2, haystack: $functions);
-        self::assertInstanceOf(expected: TwigFunction::class, actual: $functions[0]);
-        self::assertInstanceOf(expected: TwigFunction::class, actual: $functions[1]);
-        self::assertEquals(expected: 'is_password_expired', actual: $functions[0]->getName());
-        self::assertEquals(expected: 'is_password_nearing_expiration', actual: $functions[1]->getName());
+        self::assertCount(2, $functions);
+        self::assertInstanceOf(TwigFunction::class, $functions[0]);
+        self::assertInstanceOf(TwigFunction::class, $functions[1]);
+        self::assertEquals('is_password_expired', $functions[0]->getName());
+        self::assertEquals('is_password_nearing_expiration',  $functions[1]->getName());
     }
 
     public function testIsPasswordExpired(): void
     {
-        $this->checker = $this->createMock(type: PasswordExpirationChecker::class);
+        $this->checker = $this->createMock(PasswordExpirationChecker::class);
         $this->checker->expects($this->once())
             ->method('isPasswordExpired')
             ->with(user: $this->user)
-            ->willReturn(value: true);
+            ->willReturn(true);
         $this->extension = new PasswordExpirationExtension(passwordExpirationChecker: $this->checker);
 
-        self::assertTrue(condition: $this->extension->isPasswordExpired(user: $this->user));
+        self::assertTrue($this->extension->isPasswordExpired($this->user));
     }
 
     public function testIsPasswordExpiredWithNullUser(): void
     {
-        $this->checker = $this->createMock(type: PasswordExpirationChecker::class);
+        $this->checker = $this->createMock(PasswordExpirationChecker::class);
         $this->checker->expects($this->never())->method('isPasswordExpired');
         $this->extension = new PasswordExpirationExtension(passwordExpirationChecker: $this->checker);
 
-        self::assertFalse(condition: $this->extension->isPasswordExpired(user: null));
+        self::assertFalse($this->extension->isPasswordExpired(user: null));
     }
 
     public function testIsPasswordNearingExpiration(): void
     {
-        $this->checker = $this->createMock(type: PasswordExpirationChecker::class);
+        $this->checker = $this->createMock(PasswordExpirationChecker::class);
         $this->checker->expects($this->once())
             ->method('isPasswordNearingExpiration')
             ->with(user: $this->user)
-            ->willReturn(value: true);
+            ->willReturn(true);
         $this->extension = new PasswordExpirationExtension(passwordExpirationChecker: $this->checker);
 
-        self::assertTrue(condition: $this->extension->isPasswordNearingExpiration(user: $this->user));
+        self::assertTrue($this->extension->isPasswordNearingExpiration(user: $this->user));
     }
 
     public function testIsPasswordNearingExpirationWithNullUser(): void
     {
-        $this->checker = $this->createMock(type: PasswordExpirationChecker::class);
+        $this->checker = $this->createMock(PasswordExpirationChecker::class);
         $this->checker->expects($this->never())->method('isPasswordNearingExpiration');
         $this->extension = new PasswordExpirationExtension(passwordExpirationChecker: $this->checker);
 
-        self::assertFalse(condition: $this->extension->isPasswordNearingExpiration(user: null));
+        self::assertFalse($this->extension->isPasswordNearingExpiration(user: null));
     }
 }

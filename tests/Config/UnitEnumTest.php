@@ -9,6 +9,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UnitEnumTest extends TestCase
 {
+    /**
+     * @return array <int, array{Unit, string}>
+     */
     public static function unitLabelProvider(): array
     {
         return [
@@ -19,26 +22,26 @@ class UnitEnumTest extends TestCase
         ];
     }
 
-    #[DataProvider(methodName: 'unitLabelProvider')]
+    #[DataProvider('unitLabelProvider')]
     public function testLabel(Unit $unit, string $expectedLabel): void
     {
-        self::assertSame(expected: $expectedLabel, actual: $unit->label());
+        self::assertSame($expectedLabel, $unit->label());
     }
 
     public function testTrans(): void
     {
-        $translator = $this->createMock(type: TranslatorInterface::class);
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->once())
-            ->method(constraint: 'trans')
+            ->method('trans')
             ->with(
                 'unit.days',
                 [],
                 'PswExpirationBundle',
                 'fr'
             )
-            ->willReturn(value: 'jours');
+            ->willReturn('jours');
 
         $translated = Unit::DAYS->trans(translator: $translator, locale: 'fr');
-        self::assertSame(expected: 'jours', actual: $translated);
+        self::assertSame('jours', $translated);
     }
 }
