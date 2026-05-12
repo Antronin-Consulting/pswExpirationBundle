@@ -6,7 +6,7 @@ use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 return static function (DefinitionConfigurator $definition): void {
     $definition->rootNode()->children()
         ->enumNode(name: 'unit')
-        ->values(values: array_map(fn (Unit $unit) => $unit->value, Unit::cases()))
+        ->enumFqcn(enumFqcn: Unit::class)
         ->defaultValue(value: Unit::DAYS->value)
         ->info(info: 'The unit of time for password expiration.')->end()
         ->integerNode(name: 'lifetime')

@@ -25,9 +25,9 @@ class PswExpirationBundle extends AbstractBundle
     {
         $container->import(resource: '../config/services.yaml');
 
-        $container->setParameter(name: 'psw_expiration.lifetime', value: $config['password_lifetime']);
-        $container->setParameter(name: 'psw_expiration.warning_threshold', value: $config['warning_threshold']);
-        $container->setParameter(name: 'psw_expiration.unit', value: Unit::from(value: $config['unit']));
+        $builder->setParameter(name: 'psw_expiration.lifetime', value: $config['lifetime']);
+        $builder->setParameter(name: 'psw_expiration.warning_threshold', value: $config['warning_threshold']);
+        $builder->setParameter(name: 'psw_expiration.unit', value: $config['unit']);
     }
 
     public function configure(DefinitionConfigurator $definition): void

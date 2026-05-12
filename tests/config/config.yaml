@@ -1,0 +1,7 @@
+framework:
+    secret: 'test'
+
+psw_expiration:
+    lifetime: '%env(int:PSW_LIFETIME)%'
+    warning_threshold: '%env(int:PSW_WARNING)%'
+    unit: '%env(enum:AntroninConsulting\PswExpirationBundle\Config\Unit:PSW_UNIT)%'
